@@ -480,7 +480,9 @@
            5 VARIANTS DATASET (10 Questions per variant = 50 total questions)
            Strictly matched to Learning Outcomes: 6.4.1.1, 6.3.3.1, 6.1.1.1, 6.1.1.2
            ========================================================================== */
-        const quizData = {
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZ88Xc19jEhpdVWGGbU_SOjGEUR8SCz6bh8M6J9ODEFRKsLXDq2keMarfAl33fsEwz/exec";
+
+f        const quizData = {
             1: [
                 {
                     om: "6.4.1.1",
@@ -1399,7 +1401,24 @@
 
             const percent = Math.round((correctCount / 10) * 100);
             currentState.variantScores[currentState.selectedVariant] = correctCount;
+const resultData = {
+    date: new Date().toLocaleString("kk-KZ"),
+    studentName: currentState.studentName,
+    studentClass: currentState.studentClass,
+    subjectTitle: `Информатика — ${currentState.selectedVariant}-нұсқа`,
+    score: correctCount,
+    total: 10,
+    percentage: percent
+};
 
+fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(resultData)
+});
             // View switch
             document.getElementById('viewQuiz').classList.add('hidden');
             document.getElementById('viewResult').classList.remove('hidden');
