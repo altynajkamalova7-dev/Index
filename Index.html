@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="kk" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6-сынып Информатика | Интерактивті Тест Жүйесі</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#10b981',
+                            600: '#059669',
+                            dark: '#0a0f1d',
+                            card: '#131b2e',
+                            border: '#243049'
+                        }
+                    },
+                    animation: {
+                        'bounce-short': 'bounce 0.6s ease-in-out 1',
+                        'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        'float': 'float 3s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        popIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #080d1a;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(147, 51, 234, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: rgba(19, 27, 46, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #38bdf8, #34d399, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .emoji-toast {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            pointer-events: none;
+            animation: floatUp 1.2s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translate(-50%, -20px) scale(0.5); }
+            30% { opacity: 1; transform: translate(-50%, -50px) scale(1.3); }
+            80% { opacity: 1; transform: translate(-50%, -70px) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -100px) scale(0.8); }
+        }
+
+        /* Print styles for certificates */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-only { display: block !important; }
+            .glass-panel { border: none !important; background: none !important; box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Floating Emoji Reaction Container -->
+    <div id="emojiToastContainer"></div>
+
+    <!-- Top Header -->
+    <header class="no-print glass-panel sticky top-0 z-40 border-b border-slate-800/80 px-4 lg:px-8 py-3">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goToHome()">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 via-emerald-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-laptop-code text-xl text-slate-950"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold tracking-tight gradient-text">
+                        Информатика 6-сынып
+                    </h1>
+                    <p class="text-[11px] text-slate-400 font-semibold">Интерактивті Білім Тексеру Жүйесі</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Info / Actions -->
+            <div class="flex items-center gap-3">
+                <span id="headerUserBadge" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-300 font-medium">
+                    <i class="fa-solid fa-user-graduate text-emerald-400"></i>
+                    <span id="headerUserName">Оқушы</span>
+                </span>
+                <button onclick="showObjectivesModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-bullseye"></i>
+                    <span class="hidden md:inline">Оқу мақсаттары</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto px-4 lg:px-6 py-6 flex-1 w-full">
+
+        <!-- VIEW 1: HOME / VARIANT SELECTOR -->
+        <section id="viewHome" class="space-y-6">
+            <!-- Welcome Banner -->
+            <div class="glass-panel p-6 lg:p-8 rounded-3xl border border-slate-800 relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-10 -top-10 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="max-w-2xl space-y-4">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-sparkles"></i> 2026 Жылғы Жаңартылған Бағдарлама
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+                        Информатика пәні бойынша біліміңді <span class="gradient-text">онлайн тексер!</span>
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Сайтта 5 нұсқа, әр нұсқада 10 интерактивті сұрақ бар. Әр жауап бергенде смайликтер арқылы реакция аласыз. Соңында сертификат пен егжей-тегжейлі нәтиже шығады!
+                    </p>
+                </div>
+
+                <!-- Student Info Input Box -->
+                <div class="mt-6 pt-6 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1.5">Оқушының тегі мен есімі:</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                            <input type="text" id="inputStudentName" placeholder="Мысалы: Арман Серіков" 
+                                   class="w-full pl-9 pr-4 py-2.5 bg-slate-950/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-semibold transition">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1.5">Сыныбы:</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-school absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                            <input type="text" id="inputStudentClass" value="6 «Ә» сыныбы" placeholder="6 «Ә»" 
+                                   class="w-full pl-9 pr-4 py-2.5 bg-slate-950/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-semibold transition">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Variants Grid Header -->
+            <div class="flex items-center justify-between pt-2">
+                <h3 class="text-base font-extrabold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-emerald-400"></i>
+                    <span>Тест нұсқасын таңдаңыз (5 нұсқа):</span>
+                </h3>
+                <span class="text-xs text-slate-400">10 сұрақ / 15 минут</span>
+            </div>
+
+            <!-- 5 Variant Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="variantsContainer">
+                <!-- Variant 1 -->
+                <div onclick="selectVariant(1)" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-emerald-500/60 transition-all duration-300 hover:-translate-y-1 cursor-pointer group relative overflow-hidden">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-extrabold text-sm group-hover:scale-110 transition-transform">
+                            01
+                        </div>
+                        <span id="badgeVar1" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                            Орындалмаған
+                        </span>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-100 group-hover:text-emerald-400 transition-colors">1-нұсқа: Компьютер және Жасанды Интеллект</h4>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Желідегі қауіпсіздік, Деректер мен Ақпарат, Процессор және Файлдық жүйе.</p>
+                    <div class="mt-4 flex items-center justify-between text-xs font-semibold text-emerald-400">
+                        <span>Бастау <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                        <span class="text-slate-500 text-[10px]">10 Сұрақ</span>
+                    </div>
+                </div>
+
+                <!-- Variant 2 -->
+                <div onclick="selectVariant(2)" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-cyan-500/60 transition-all duration-300 hover:-translate-y-1 cursor-pointer group relative overflow-hidden">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-extrabold text-sm group-hover:scale-110 transition-transform">
+                            02
+                        </div>
+                        <span id="badgeVar2" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                            Орындалмаған
+                        </span>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-100 group-hover:text-cyan-400 transition-colors">2-нұсқа: Кибербуллинг және Компьютер Жады</h4>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Интернеттегі агрессия, ЖИ модельдері, RAM/ROM жады және ОЖ кеңейтілімдері.</p>
+                    <div class="mt-4 flex items-center justify-between text-xs font-semibold text-cyan-400">
+                        <span>Бастау <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                        <span class="text-slate-500 text-[10px]">10 Сұрақ</span>
+                    </div>
+                </div>
+
+                <!-- Variant 3 -->
+                <div onclick="selectVariant(3)" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-indigo-500/60 transition-all duration-300 hover:-translate-y-1 cursor-pointer group relative overflow-hidden">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-extrabold text-sm group-hover:scale-110 transition-transform">
+                            03
+                        </div>
+                        <span id="badgeVar3" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                            Орындалмаған
+                        </span>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-100 group-hover:text-indigo-400 transition-colors">3-нұсқа: ЖИ және Деректер Рөлі</h4>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Алаяқтықтан қорғану, Дерек-Ақпарат-Білім, Процессор жиілігі және ОЖ кеңейтілімдері.</p>
+                    <div class="mt-4 flex items-center justify-between text-xs font-semibold text-indigo-400">
+                        <span>Бастау <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                        <span class="text-slate-500 text-[10px]">10 Сұрақ</span>
+                    </div>
+                </div>
+
+                <!-- Variant 4 -->
+                <div onclick="selectVariant(4)" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-purple-500/60 transition-all duration-300 hover:-translate-y-1 cursor-pointer group relative overflow-hidden">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-extrabold text-sm group-hover:scale-110 transition-transform">
+                            04
+                        </div>
+                        <span id="badgeVar4" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                            Орындалмаған
+                        </span>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-100 group-hover:text-purple-400 transition-colors">4-нұсқа: Ақпараттық Сипаттамалар</h4>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Интернет троллинг, ЖИ машиналық оқыту, Аналық плата және Архивтеу.</p>
+                    <div class="mt-4 flex items-center justify-between text-xs font-semibold text-purple-400">
+                        <span>Бастау <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                        <span class="text-slate-500 text-[10px]">10 Сұрақ</span>
+                    </div>
+                </div>
+
+                <!-- Variant 5 -->
+                <div onclick="selectVariant(5)" class="glass-panel p-5 rounded-2xl border border-slate-800 hover:border-amber-500/60 transition-all duration-300 hover:-translate-y-1 cursor-pointer group relative overflow-hidden">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-extrabold text-sm group-hover:scale-110 transition-transform">
+                            05
+                        </div>
+                        <span id="badgeVar5" class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                            Орындалмаған
+                        </span>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-100 group-hover:text-amber-400 transition-colors">5-нұсқа: Кешенді Қорытынды Тест</h4>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Фишинг, «Garbage in garbage out» принципі, Кэш-жады және Файл атаулары.</p>
+                    <div class="mt-4 flex items-center justify-between text-xs font-semibold text-amber-400">
+                        <span>Бастау <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                        <span class="text-slate-500 text-[10px]">10 Сұрақ</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: QUIZ INTERFACE -->
+        <section id="viewQuiz" class="hidden space-y-5">
+            <!-- Test Header Toolbar -->
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <button onclick="confirmExitQuiz()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition border border-slate-700">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h3 class="font-bold text-sm text-slate-100" id="quizVariantTitle">1-нұсқа</h3>
+                        <p class="text-[11px] text-slate-400" id="quizStudentInfo">Арман Серіков — 6 «Ә»</p>
+                    </div>
+                </div>
+
+                <!-- Live Timer & Progress Badge -->
+                <div class="flex items-center gap-3">
+                    <div class="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-clock animate-pulse"></i>
+                        <span id="timerDisplay">15:00</span>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-extrabold text-emerald-400">
+                        Сұрақ: <span id="currentQNum">1</span> / 10
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
+                <div id="quizProgressBar" class="bg-gradient-to-r from-cyan-500 via-emerald-500 to-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 10%;"></div>
+            </div>
+
+            <!-- Question Numbers Quick Jump Bar -->
+            <div class="flex items-center justify-between gap-1.5 overflow-x-auto py-1" id="qJumpBar">
+                <!-- Buttons 1-10 populated by JS -->
+            </div>
+
+            <!-- Question Card -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800/90 shadow-2xl relative space-y-6">
+                <!-- Learning Objective Tag -->
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <span id="qObjectiveTag" class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[11px] font-bold">
+                        ОМ: 6.4.1.1
+                    </span>
+                    <span id="qTopicTag" class="text-xs font-semibold text-slate-400">
+                        Желідегі қауіпсіздік
+                    </span>
+                </div>
+
+                <!-- Question Text -->
+                <h2 id="questionText" class="text-base sm:text-lg font-extrabold text-slate-100 leading-snug">
+                    Сұрақ жүктелуде...
+                </h2>
+
+                <!-- Answer Options List -->
+                <div class="space-y-3" id="optionsContainer">
+                    <!-- Option items generated by JS -->
+                </div>
+
+                <!-- Immediate Explanation Box (shown after option select) -->
+                <div id="feedbackBox" class="hidden p-4 rounded-2xl border transition-all duration-300 text-xs space-y-1">
+                    <div class="font-extrabold flex items-center gap-2" id="feedbackTitle">
+                        <!-- Correct/Incorrect Title -->
+                    </div>
+                    <p id="feedbackText" class="text-slate-300 leading-relaxed"></p>
+                </div>
+
+                <!-- Action Controls (Prev, Next, Submit) -->
+                <div class="flex items-center justify-between pt-4 border-t border-slate-800/80">
+                    <button id="btnPrev" onclick="navigateQuestion(-1)" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center gap-2 border border-slate-700 disabled:opacity-40">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span>Алдыңғы</span>
+                    </button>
+
+                    <button id="btnNext" onclick="navigateQuestion(1)" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                        <span>Келесі</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <button id="btnSubmit" onclick="finishTest()" class="hidden px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                        <i class="fa-solid fa-flag-checkered"></i>
+                        <span>Тестті аяқтау</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: RESULTS & CERTIFICATE -->
+        <section id="viewResult" class="hidden space-y-6">
+            <!-- Result Summary Hero Card -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 text-center space-y-5 relative overflow-hidden">
+                <div id="resultConfettiBg" class="absolute inset-0 pointer-events-none"></div>
+
+                <!-- Emoji Grade Badge -->
+                <div class="w-24 h-24 mx-auto rounded-3xl bg-slate-900 border-2 border-emerald-500/40 flex items-center justify-center text-5xl shadow-2xl animate-bounce-short" id="resultEmojiIcon">
+                    🎉
+                </div>
+
+                <div>
+                    <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-widest" id="resultGradeText">Өте тамаша!</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1" id="resultStudentTitle">
+                        Арман Серіков — 10 / 10 Балл
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1" id="resultVariantSubtitle">1-нұсқа нәтижесі</p>
+                </div>
+
+                <!-- Score Breakdown Stats -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-2">
+                    <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800">
+                        <div class="text-[10px] text-slate-400 font-semibold">Жалпы сұрақ</div>
+                        <div class="text-lg font-bold text-slate-200">10</div>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-800/60">
+                        <div class="text-[10px] text-emerald-400 font-semibold">Дұрысы</div>
+                        <div class="text-lg font-bold text-emerald-300" id="statCorrect">0</div>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-800/60">
+                        <div class="text-[10px] text-rose-400 font-semibold">Қатесі</div>
+                        <div class="text-lg font-bold text-rose-300" id="statWrong">0</div>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-800/60">
+                        <div class="text-[10px] text-cyan-400 font-semibold">Пайыздық көрсеткіш</div>
+                        <div class="text-lg font-bold text-cyan-300" id="statPercent">0%</div>
+                    </div>
+                </div>
+
+                <!-- Certificate & Action Buttons -->
+                <div class="flex items-center justify-center gap-3 pt-2 flex-wrap no-print">
+                    <button onclick="printCertificate()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-file-certificate"></i>
+                        <span>Сертификатты жүктеу / Басып шығару</span>
+                    </button>
+                    <button onclick="goToHome()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition flex items-center gap-2 border border-slate-700">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Басты бетке оралу</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detailed Answers Review Table -->
+            <div class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+                <h3 class="text-base font-extrabold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-cyan-400"></i>
+                    <span>Қатемен жұмыс (Егжей-тегжейлі талдау):</span>
+                </h3>
+
+                <div class="space-y-3" id="answersReviewContainer">
+                    <!-- Reviewed question items generated by JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: LEARNING OBJECTIVES -->
+    <div id="objectivesModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel bg-slate-900 border border-slate-800 rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 relative">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye text-emerald-400"></i>
+                    <span> Бағдарламаның Оқу Мақсаттары</span>
+                </h3>
+                <button onclick="closeObjectivesModal()" class="text-slate-400 hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 max-h-96 overflow-y-auto text-xs pr-1">
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                    <span class="font-extrabold text-emerald-400">ОМ 6.4.1.1</span>
+                    <p class="text-slate-300">Желідегі техника қауіпсіздігі ережесін бұзудың салдарларын (алаяқтық, интернеттегі агрессия, ойынға тәуелділік) талқылау.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                    <span class="font-extrabold text-cyan-400">ОМ 6.3.3.1</span>
+                    <p class="text-slate-300">«Деректер», «ақпарат», «білім» ұғымдарының мәнін ажырата білу және жасанды интеллект моделдерін оқытудағы деректердің рөлі туралы түсіндіру.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                    <span class="font-extrabold text-indigo-400">ОМ 6.1.1.1</span>
+                    <p class="text-slate-300">Жүйелік блоктің негізгі құрылғылары мен компьютердің жады (RAM, ROM, сыртқы сақтау, кэш-жады) түрлерінің қызметтерін сипаттау, ОП-ның (ядро, тактілік жиілік) сипаттамаларын атау.</p>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                    <span class="font-extrabold text-purple-400">ОМ 6.1.1.2</span>
+                    <p class="text-slate-300">Операциялық жүйенің негізгі функцияларын атау және файлдық жүйеде файл атауларына байланысты ережелер мен кеңейтілімдерді қолдану.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="no-print glass-panel border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500">
+        <p>6-сынып Информатика Интерактивті Тесті &copy; 2026. GitHub Pages-ке орналастыруға толық дайын single-file HTML/JS/CSS.</p>
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           5 VARIANTS DATASET (10 Questions per variant = 50 total questions)
+           Strictly matched to Learning Outcomes: 6.4.1.1, 6.3.3.1, 6.1.1.1, 6.1.1.2
+           ========================================================================== */
+        const quizData = {
+            1: [
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Интернетте белгісіз сілтемеге өтіп, жеке банктік карта мәліметтерін немесе құпия сөзді енгізіп қою қаупі қалай аталады?",
+                    options: [
+                        "Интернеттегі агрессия",
+                        "Фишинг (Алаяқтық)",
+                        "Ойынға тәуелділік",
+                        "Вирусқа қарсы қорғаныс"
+                    ],
+                    correct: 1,
+                    explanation: "Фишинг — пайдаланушыларды алдап, олардың құпия мәліметтерін (пароль, карта номері) ұрлауға бағытталған интернет-алаяқтық түрі."
+                },
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Оқушының компьютерлік ойындарды тоқтата алмауы, сабаққа және денсаулыққа көңіл бөлмеуі қандай салдарға жатады?",
+                    options: [
+                        "Ақпараттық қауіпсіздік",
+                        "Ойынға тәуелділік (Игромания)",
+                        "Кибербуллинг",
+                        "Сетевой троллинг"
+                    ],
+                    correct: 1,
+                    explanation: "Ойынға тәуелділік — психологиялық проблема болып табылады, бұл уақытты дұрыс жоспарламаудан туындайды."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "Өңделмеген, белгілі бір контекстке ие емес сан, мәтін немесе символдар жиынтығы қалай аталады?",
+                    options: [
+                        "Білім",
+                        "Деректер (Data)",
+                        "Ақпарат",
+                        "Модель"
+                    ],
+                    correct: 1,
+                    explanation: "Деректер — бұл әлі өңделмеген, бастапқы фактілер мен цифрлар."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "Жасанды интеллект моделін (мысалы, суреттерді танитын ЖИ) сапалы үйрету үшін ең маңызды фактор не?",
+                    options: [
+                        "Монитордың диагоналі",
+                        "Үлкен көлемдегі дұрыс және сапалы деректер жинағы (Data)",
+                        "Пернетақта жылдамдығы",
+                        "Компьютердің түсі"
+                    ],
+                    correct: 1,
+                    explanation: "ЖИ модельдері оқытылатын деректердің сапасы мен көлеміне тікелей тәуелді."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Компьютер сөндірілгенде ішіндегі барлық ақпарат жойылатын уақытша жедел сақтау құрылғысы қайсысы?",
+                    options: [
+                        "ROM (Тұрақты жады)",
+                        "RAM (Жедел жады)",
+                        "Қатқыл диск (HDD)",
+                        "Флеш-карта"
+                    ],
+                    correct: 1,
+                    explanation: "RAM (Random Access Memory) — энергияға тәуелді уақытша сақтау жадысы."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Компьютердегі барлық есептеулер мен логикалық операцияларды орындайтын «бас құрылғы»:",
+                    options: [
+                        "Коректік блок",
+                        "Орталық процессор (CPU)",
+                        "Видеокарта",
+                        "Дыбыс картасы"
+                    ],
+                    correct: 1,
+                    explanation: "Орталық процессор (CPU) — компьютердің барлық жұмысын басқаратын негізгі миы."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Процессордың 1 секундта орындайтын операциялар санын анықтайтын сипаттама:",
+                    options: [
+                        "Ядро саны",
+                        "Тактілік жиілік (ГГц)",
+                        "Жады көлемі",
+                        "Шинаның ұзындығы"
+                    ],
+                    correct: 1,
+                    explanation: "Тактілік жиілік (Гц, МГц, ГГц) — процессордың жылдамдығын көрсетеді."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Операциялық жүйенің (ОЖ) негізгі функцияларына қайсысы ЖАТПАЙДЫ?",
+                    options: [
+                        "Файлдық жүйені басқару",
+                        "Пайдаланушымен интерфейсті ұйымдастыру",
+                        "Компьютер корпусын физикалық тазалау",
+                        "Аппараттық құрылғыларды басқару"
+                    ],
+                    correct: 2,
+                    explanation: "Компьютерді физикалық тазалау — бұл бағдарламалық ОЖ-нің міндеті емес."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "«referat.docx» файлының кеңейтілімі (.docx) нені білдіреді?",
+                    options: [
+                        "Файлдың тек дыбыстық екенін",
+                        "Файлдың MS Word мәтіндік құжаты екенін",
+                        "Файлдың видео файл екенін",
+                        "Файлдың орындалатын программа екенін"
+                    ],
+                    correct: 1,
+                    explanation: ".docx кеңейтілімі мәтіндік документтерге арналған."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Windows ОЖ-де файл атауында қолдануға БОЛМАЙТЫН таңба қайсысы?",
+                    options: [
+                        "Сызықша (-)",
+                        "Төменгі сызық (_)",
+                        "Сұрақ белгісі (?) және слэш (/)",
+                        "Сандар (0-9)"
+                    ],
+                    correct: 2,
+                    explanation: "Файл атында / \\ : * ? \" < > | таңбаларын қолдануға болмайды."
+                }
+            ],
+            2: [
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Интернет желісінде біреуге қорлау сөздерін жазу, жеке абыройына тию қалай аталады?",
+                    options: [
+                        "Кибербуллинг (Интернеттегі агрессия)",
+                        "Ақпараттық іздеу",
+                        "Компьютерлік вирустар",
+                        "Деректерді архивтеу"
+                    ],
+                    correct: 0,
+                    explanation: "Кибербуллинг — цифрлық құрылғылар арқылы біреуге қайталанып жасалатын агрессия."
+                },
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Интернетте аккаунттың қауіпсіздігін қамтамасыз ету үшін ең сенімді пароль түрі қайсысы?",
+                    options: [
+                        "12345678",
+                        "Оқушының туған жылы",
+                        "Бас және кіші әріптер, сандар, арнайы белгілері бар күрделі пароль (Мысалы: K2#p9!mQ)",
+                        "Өз есімі"
+                    ],
+                    correct: 2,
+                    explanation: "Күрделі құпия сөздерді бұзу өте қиын болады."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "Деректерді өңдеу, реттеу және контекстке келтіру нәтижесінде алынған мағыналы түсінік:",
+                    options: [
+                        "Ақпарат (Information)",
+                        "Бастапқы файл",
+                        "Жүйелік блок",
+                        "Пиксель"
+                    ],
+                    correct: 0,
+                    explanation: "Деректер өңделгенде ақпаратқа айналады."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "«Деректер» -> «Ақпарат» -> «...» білім беру тізбегін аяқтаңыз:",
+                    options: [
+                        "Код",
+                        "Білім (Knowledge)",
+                        "Файл",
+                        "Байт"
+                    ],
+                    correct: 1,
+                    explanation: "Ақпаратты түсініп, оны іс-жүзінде қолдана білу — Білімге әкеледі."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Компьютерді қосқанда жүктелу программалары сақталатын, тек оқуға арналған тұрақты жады:",
+                    options: [
+                        "RAM",
+                        "ROM (Read Only Memory)",
+                        "Flash Drive",
+                        "Кэш-жады"
+                    ],
+                    correct: 1,
+                    explanation: "ROM — компьютер өшсе де деректерін жоғалтпайтын тұрақты жады."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Процессор мен Жедел жады (RAM) арасындағы өте жылдам жұмыс істейтін буферлік жады:",
+                    options: [
+                        "Кэш-жады (Cache)",
+                        "Сыртқы HDD",
+                        "Дискета",
+                        "Оптикалық диск"
+                    ],
+                    correct: 0,
+                    explanation: "Кэш-жады процессордың деректерге қолжетімділік уақытын азайтады."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Процессордың бір уақытта бірнеше тапсырманы қатар орындау қабілетін арттыратын көрсеткіш:",
+                    options: [
+                        "Ядро саны (Core count)",
+                        "Монитор жиілігі",
+                        "Тінтуір батырмалары",
+                        "Кабель ұзындығы"
+                    ],
+                    correct: 0,
+                    explanation: "Көп ядролы процессорлар тапсырмаларды параллель түрде орындай алады."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Графикалық сурет файлының кеңейтілімін табыңыз:",
+                    options: [
+                        ".mp3",
+                        ".png немесе .jpg",
+                        ".exe",
+                        ".txt"
+                    ],
+                    correct: 1,
+                    explanation: ".png және .jpg — суреттер мен фотосуреттер форматы."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Орындалатын программалар мен қолданбалардың кеңейтілімі қайсысы?",
+                    options: [
+                        ".exe",
+                        ".docx",
+                        ".mp4",
+                        ".zip"
+                    ],
+                    correct: 0,
+                    explanation: ".exe (Executable) — орындалатын бағдарлама файлы."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Файлдық жүйеде файлдар мен папкалардың орналасу құрылымы қандай формада болады?",
+                    options: [
+                        "Сызықтық",
+                        "Иерархиялық (Ағаш тәрізді)",
+                        "Шеңберлік",
+                        "Кестелік"
+                    ],
+                    correct: 1,
+                    explanation: "Файлдық жүйе бутақты ағаш сияқты иерархиялық ретпен орналасады."
+                }
+            ],
+            3: [
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Желіде бейтаныс адам сізден үй мекенжайын немесе ата-анаңыздың телефонын сұраса не істеу керек?",
+                    options: [
+                        "Бөлісу керек",
+                        "Жауап бермеу, бұғаттау және бұл туралы ата-анаға немесе мұғалімге айту",
+                        "Достарыңа жіберу",
+                        "Сыйлық сұрау"
+                    ],
+                    correct: 1,
+                    explanation: "Жеке мәліметтерді желіде бейтаныстарға беру қауіпті."
+                },
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Интернетке тәуелділік пен көздің талуын болдырмау үшін не істеу қажет?",
+                    options: [
+                        "Компьютер алдында 10 сағат тоқтаусыз отыру",
+                        "Әр 30-40 минут сайын үзіліс жасап, көзге жаттығу жасау",
+                        "Түнде жарықты өшіріп ойнау",
+                        "Тамақ ішпей ойнау"
+                    ],
+                    correct: 1,
+                    explanation: "Денсаулықты сақтау үшін регламенттелген үзілістер қажет."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "Мектеп оқушысының дене температурасы «36.6 °C» — бұл мысал неге жатады?",
+                    options: [
+                        "Дерекке (Data)",
+                        "Білімге",
+                        "ЖИ алгоритміне",
+                        "Операциялық жүйеге"
+                    ],
+                    correct: 0,
+                    explanation: "Бұл жеке алынған өңделмеген сан — дерек болып табылады."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "Жасанды интеллект автокөлігі (беспилотник) жолдағы белгілерді тану үшін оған не берілуі керек?",
+                    options: [
+                        "Мыңдаған жол белгілерінің фото-деректер базасы",
+                        "Тек бензин",
+                        "Тек музыкалық файлдар",
+                        "Компьютерлік ойын"
+                    ],
+                    correct: 0,
+                    explanation: "ЖИ моделі белгілерді тану үшін арнайы деректер жиынтығымен үйретіледі."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Сыртқы сақтау құрылғыларына (ақпаратты ұзақ сақтау) қайсысы жатады?",
+                    options: [
+                        "RAM",
+                        "Кэш-жады",
+                        "Қатқыл диск (HDD/SSD) және Флеш-жады",
+                        "Регистрлер"
+                    ],
+                    correct: 2,
+                    explanation: "HDD, SSD және USB флешкалар — ақпаратты тұрақты сыртқы сақтау құрылғылары."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Процессордың тактілік жиілігі әдетте қай өлшем бірлікпен өлшенеді?",
+                    options: [
+                        "Мегабайт (МБ)",
+                        "Гигагерц (ГГц)",
+                        "Пиксель",
+                        "Вольт"
+                    ],
+                    correct: 1,
+                    explanation: "Тактілік жиілік Герцпен (Гц, МГц, ГГц) өлшенеді."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Жүйелік блоктың ішіндегі барлық құрылғыларды бір-бірімен электрлік тізбектер арқылы жалғайтын негізгі плата:",
+                    options: [
+                        "Дыбыс картасы",
+                        "Аналық плата (Motherboard)",
+                        "Қорек блогы",
+                        "Кулер"
+                    ],
+                    correct: 1,
+                    explanation: "Аналық плата — компьютердің барлық құрамдас бөліктерін біріктіреді."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Дыбыстық (аудио) файл кеңейтілімін таңдаңыз:",
+                    options: [
+                        ".mp3",
+                        ".txt",
+                        ".bmp",
+                        ".html"
+                    ],
+                    correct: 0,
+                    explanation: ".mp3 — танымал аудио формат."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Python бағдарламалау тілінде жазылған файлдың кеңейтілімі қандай болады?",
+                    options: [
+                        ".py",
+                        ".pas",
+                        ".cpp",
+                        ".java"
+                    ],
+                    correct: 0,
+                    explanation: "Python скрипттері .py кеңейтілімімен сақталады."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Файлдарды сиымдылығын кішірейтіп, бір файлға тығыздап сақтау процесі қалай аталады?",
+                    options: [
+                        "Форматтау",
+                        "Архивтеу (.zip, .rar)",
+                        "Көшіру",
+                        "Жою"
+                    ],
+                    correct: 1,
+                    explanation: "Архивтеу файлдардың көлемін азайтуға мүмкіндік береді."
+                }
+            ],
+            4: [
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Интернет форумында немесе чатта басқа пайдаланушыларды әдейі ашуландыру үшін провокациялық хабарлама жазатын адам:",
+                    options: [
+                        "Тролл (Интернет троллинг)",
+                        "Модератор",
+                        "Жүйелік администратор",
+                        "Блогер"
+                    ],
+                    correct: 0,
+                    explanation: "Троллинг — бұл интернетте қақтығыстар тудыруға бағытталған агрессивті мінез-құлық."
+                },
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Фишингтік хабарламалардың басты белгісі қайсысы?",
+                    options: [
+                        "Досыңнан келген жай сәлемдесу",
+                        "Шұғыл түрде «Сыйлық ұтып алдыңыз, банктік парольді енгізіңіз» деген күмәнді сілтеме",
+                        "Сабақ кестесі",
+                        "Мектеп сайтындағы жаңалық"
+                    ],
+                    correct: 1,
+                    explanation: "Алаяқтар көбінесе жылдам шешім қабылдату үшін сыйлық немесе корқынышты хабарлама жазады."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "«Бүгін ауа райы 25°C, жылы және ашық болады» сөйлемі неге жатады?",
+                    options: [
+                        "Өңделген Ақпаратқа (Information)",
+                        "Тек Дерекке",
+                        "Вирусқа",
+                        "Операциялық жүйеге"
+                    ],
+                    correct: 0,
+                    explanation: "Бұл жерде мән-мағынасы бар, контексті түсінікті ақпарат берілген."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "Тәжірибе мен ізденіс арқылы ақпаратты терең түсініп, оны шешім қабылдауда қолдану қабілеті:",
+                    options: [
+                        "Білім (Knowledge)",
+                        "Дерек",
+                        "Процессор",
+                        "Байт"
+                    ],
+                    correct: 0,
+                    explanation: "Білім — ақпаратты сараралап, пайдалана алу нәтижесі."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "BIOS микросхемасында сақталған бағдарлама қай жады түріне орналасқан?",
+                    options: [
+                        "ROM (Тұрақты жады)",
+                        "RAM (Жедел жады)",
+                        "Флешка",
+                        "Сыртқы HDD"
+                    ],
+                    correct: 0,
+                    explanation: "BIOS базалық енгізу-шығару жүйесі ROM микросхемасында сақталады."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Процессордың салқындату жүйесі (желдеткіш) қалай аталады?",
+                    options: [
+                        "Кулер (Cooler)",
+                        "Спикер",
+                        "Транзистор",
+                        "Адаптер"
+                    ],
+                    correct: 0,
+                    explanation: "Кулер процессордың қызып кетпеуін қамтамасыз етеді."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Ақпаратты тасымалдауға арналған шағын, ықшам, қозғалмалы жады құрылғысы:",
+                    options: [
+                        "USB Флеш-жады",
+                        "Кэш L1",
+                        "Аналық плата",
+                        "Видеокарта"
+                    ],
+                    correct: 0,
+                    explanation: "USB Флешка — ақпарат тасымалдауға өте ыңғайлы сыртқы құрылғы."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Файл дегеніміз не?",
+                    options: [
+                        "Сыртқы тасымалдаушыда аты бар, белгілі бір ақпарат сақталған аймақ",
+                        "Тек суреттер сақталатын жер",
+                        "Компьютердің экраны",
+                        "Пернетақтадағы перне"
+                    ],
+                    correct: 0,
+                    explanation: "Файл — ақпаратты сақтаудың негізгі бірлігі."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Төмендегі кеңейтілімдердің қайсысы Бейнежазба (Видео) форматына жатады?",
+                    options: [
+                        ".mp4 немесе .avi",
+                        ".txt",
+                        ".exe",
+                        ".css"
+                    ],
+                    correct: 0,
+                    explanation: ".mp4 және .avi — видео файлдар форматы."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Бума (Папка) ұғымының негізгі қызметі қандай?",
+                    options: [
+                        "Файлдарды реттеп, топтастырып сақтау",
+                        "Компьютерді токқа қосу",
+                        "Интернетке өту",
+                        "Вирустарды жою"
+                    ],
+                    correct: 0,
+                    explanation: "Папкалар файлдарды ретке келтіріп сақтауға арналған контейнер."
+                }
+            ],
+            5: [
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Интернеттегі алаяқтықтан қорғанудың алтын ережесі қайсысы?",
+                    options: [
+                        "Кез келген сілтемені аша беру",
+                        "Құпия сөздерді бейтаныстарға ешқашан айтпау және күмәнді сайттарға кірмеу",
+                        "Банк картасын интернетте жариялау",
+                        "Вирусқа қарсы бағдарламаны өшіріп тастау"
+                    ],
+                    correct: 1,
+                    explanation: "Жеке мәліметтер құпиялылығы — киберқауіпсіздіктің негізі."
+                },
+                {
+                    om: "6.4.1.1",
+                    topic: "Қауіпсіздік және Интернет",
+                    q: "Компьютер немесе смартфон алдында ұзақ отырудың физикалық денсаулыққа зияны:",
+                    options: [
+                        "Көздің көруі нашарлайды және омыртқа қисаюы мүмкін",
+                        "Ештеңе болмайды",
+                        "Есте сақтау қабілеті жақсарады",
+                        "Бұл пайдалы"
+                    ],
+                    correct: 0,
+                    explanation: "Уақытты шектемеу көз бен омыртқаға салмақ түсіреді."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "«Garbage in, garbage out» (Қоқыс кірсе, қоқыс шығады) принципі ЖИ үшін нені білдіреді?",
+                    options: [
+                        "Егер ЖИ моделіне қате деректер берілсе, ЖИ қате шешім шығарады",
+                        "Компьютерді қоқысқа тастау керек",
+                        "ЖИ өте ақылды",
+                        "Деректердің қатысы жоқ"
+                    ],
+                    correct: 0,
+                    explanation: "ЖИ сапасы оған енгізілген оқыту деректеріне тура пропорционал."
+                },
+                {
+                    om: "6.3.3.1",
+                    topic: "Жасанды Интеллект & Деректер",
+                    q: "Жасанды интеллект жүйесі адам дауысын тануы үшін оған қандай деректер керек?",
+                    options: [
+                        "Мыңдаған аудиожазбалар (дыбыстық деректер)",
+                        "Тек суреттер",
+                        "Кестелік сандар",
+                        "Тек мәтіндік кітаптар"
+                    ],
+                    correct: 0,
+                    explanation: "Дауысты тану үшін сәйкес аудио-деректер жиынтығы қажет."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Процессордың ядросы дегеніміз не?",
+                    options: [
+                        "Командаларды орындайтын процессордың негізгі есептеуіш блогы",
+                        "Сыртқы вентилятор",
+                        "Қорек кабелі",
+                        "Экрандағы сурет"
+                    ],
+                    correct: 0,
+                    explanation: "Ядро — процессор ішіндегі дербес орындаушы микросхема."
+                },
+                {
+                    om: "6.1.1.1",
+                    topic: "Жүйелік Блок & Жады",
+                    q: "Кэш-жадының басты артықшылығы қандай?",
+                    options: [
+                        "Ол RAM-ға қарағанда өте жылдам жұмыс істейді",
+                        "Ол өте арзан",
+                        "Ол өте үлкен сиымдылыққа ие",
+                        "Ол флешка сияқты шешіледі"
+                    ],
+                    correct: 0,
+                    explanation: "Кэш-жады кристалл процессордың ішінде орналасатын ең жылдам жады."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Төмендегілердің қайсысы Операциялық Жүйеге (ОЖ) жатады?",
+                    options: [
+                        "Windows, Linux, macOS, Android",
+                        "MS Word, Excel",
+                        "Google Chrome",
+                        "Paint, Photoshop"
+                    ],
+                    correct: 0,
+                    explanation: "Windows, Linux, macOS, Android — компьютерлер мен гаджеттердің Операциялық Жүйелері."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Форматталған векторлық немесе электронды кітап құжатының кеңейтілімі:",
+                    options: [
+                        ".pdf",
+                        ".exe",
+                        ".mp3",
+                        ".zip"
+                    ],
+                    correct: 0,
+                    explanation: ".pdf — электронды құжаттардың әмбебап форматы."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Файл атауында оның кеңейтілімі қай белгі арқылы ажыратылады?",
+                    options: [
+                        "Нүкте (.) белгісі арқылы (мысалы: document.txt)",
+                        "Үтір (,) арқылы",
+                        "Пробел арқылы",
+                        "Дефис (-) арқылы"
+                    ],
+                    correct: 0,
+                    explanation: "Файл аты мен кеңейтілімі нүкте белгісі арқылы бөлінеді."
+                },
+                {
+                    om: "6.1.1.2",
+                    topic: "Файлдық жүйе & ОЖ",
+                    q: "Файлды өшіргенде ол Windows жүйесінде уақытша қайда түседі?",
+                    options: [
+                        "Себетке (Корзина / Recycle Bin)",
+                        "Флешкаға",
+                        "Процессорға",
+                        "Жойылмайды"
+                    ],
+                    correct: 0,
+                    explanation: "Өшірілген файлдар Себетке (Recycle Bin) түседі және оны қайта қалпына келтіруге болады."
+                }
+            ]
+        };
+
+        // APP STATE
+        let currentState = {
+            studentName: "Арман Серіков",
+            studentClass: "6 «Ә» сыныбы",
+            selectedVariant: 1,
+            currentQuestionIdx: 0,
+            userAnswers: {}, // questionIdx -> selectedOptionIdx
+            timerInterval: null,
+            timeLeft: 900, // 15 mins
+            variantScores: {} // variantId -> score
+        };
+
+        // Web Audio API Sound Feedback
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch(e){}
+        }
+
+        // Navigation Handlers
+        function goToHome() {
+            clearInterval(currentState.timerInterval);
+            document.getElementById('viewHome').classList.remove('hidden');
+            document.getElementById('viewQuiz').classList.add('hidden');
+            document.getElementById('viewResult').classList.add('hidden');
+            updateHomeVariantBadges();
+        }
+
+        function updateHomeVariantBadges() {
+            for (let v = 1; v <= 5; v++) {
+                const badge = document.getElementById(`badgeVar${v}`);
+                if (currentState.variantScores[v] !== undefined) {
+                    const sc = currentState.variantScores[v];
+                    badge.textContent = `Нәтиже: ${sc}/10`;
+                    badge.className = "text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                }
+            }
+        }
+
+        function selectVariant(vNum) {
+            const nameInput = document.getElementById('inputStudentName').value.trim();
+            const classInput = document.getElementById('inputStudentClass').value.trim();
+
+            currentState.studentName = nameInput || "Оқушы";
+            currentState.studentClass = classInput || "6-сынып";
+            currentState.selectedVariant = vNum;
+            currentState.currentQuestionIdx = 0;
+            currentState.userAnswers = {};
+            currentState.timeLeft = 900; // 15 mins
+
+            document.getElementById('headerUserName').textContent = currentState.studentName;
+            document.getElementById('quizStudentInfo').textContent = `${currentState.studentName} — ${currentState.studentClass}`;
+            document.getElementById('quizVariantTitle').textContent = `${vNum}-нұсқа бойынша тест`;
+
+            document.getElementById('viewHome').classList.add('hidden');
+            document.getElementById('viewQuiz').classList.remove('hidden');
+            document.getElementById('viewResult').classList.add('hidden');
+
+            startTimer();
+            renderQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(currentState.timerInterval);
+            const timerEl = document.getElementById('timerDisplay');
+
+            currentState.timerInterval = setInterval(() => {
+                currentState.timeLeft--;
+                const m = Math.floor(currentState.timeLeft / 60);
+                const s = currentState.timeLeft % 60;
+                timerEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                if (currentState.timeLeft <= 0) {
+                    clearInterval(currentState.timerInterval);
+                    alert("Уақыт аяқталды! Тест қорытындысы жасалады.");
+                    finishTest();
+                }
+            }, 1000);
+        }
+
+        function confirmExitQuiz() {
+            if (confirm("Тестті аяқтамай шыққыңыз келе ме? Енгізілген жауаптар сақталмайды.")) {
+                goToHome();
+            }
+        }
+
+        function renderQuestion() {
+            const qList = quizData[currentState.selectedVariant];
+            const qIdx = currentState.currentQuestionIdx;
+            const qData = qList[qIdx];
+
+            // Progress Bar & Indicators
+            document.getElementById('currentQNum').textContent = qIdx + 1;
+            const progressPct = ((qIdx + 1) / 10) * 100;
+            document.getElementById('quizProgressBar').style.width = `${progressPct}%`;
+
+            // Learning Objective Tag
+            document.getElementById('qObjectiveTag').textContent = `ОМ: ${qData.om}`;
+            document.getElementById('qTopicTag').textContent = qData.topic;
+            document.getElementById('questionText').textContent = `${qIdx + 1}. ${qData.q}`;
+
+            // Render Jump Bar
+            const jumpBar = document.getElementById('qJumpBar');
+            jumpBar.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const isAnswered = currentState.userAnswers[i] !== undefined;
+                const isCurrent = i === qIdx;
+                
+                let btnClass = "w-8 h-8 rounded-xl text-xs font-bold transition flex items-center justify-center border ";
+                if (isCurrent) {
+                    btnClass += "bg-emerald-500 text-slate-950 border-emerald-400 font-extrabold scale-110 shadow-md";
+                } else if (isAnswered) {
+                    btnClass += "bg-slate-800 text-emerald-400 border-emerald-500/50";
+                } else {
+                    btnClass += "bg-slate-900/90 text-slate-400 border-slate-800 hover:text-slate-200";
+                }
+
+                jumpBar.innerHTML += `<button onclick="jumpToQuestion(${i})" class="${btnClass}">${i+1}</button>`;
+            }
+
+            // Options Container
+            const optsContainer = document.getElementById('optionsContainer');
+            optsContainer.innerHTML = '';
+            const labels = ['A', 'B', 'C', 'D'];
+            const selectedOpt = currentState.userAnswers[qIdx];
+
+            qData.options.forEach((optText, optIdx) => {
+                const isSelected = selectedOpt === optIdx;
+                let cardStyle = "p-4 rounded-2xl border transition-all duration-200 cursor-pointer flex items-center justify-between group ";
+
+                if (isSelected) {
+                    cardStyle += "bg-emerald-500/15 border-emerald-500/80 text-emerald-200 shadow-lg shadow-emerald-500/10";
+                } else {
+                    cardStyle += "bg-slate-900/80 hover:bg-slate-800/90 border-slate-800/80 text-slate-200 hover:border-slate-700";
+                }
+
+                optsContainer.innerHTML += `
+                    <div onclick="selectOption(${optIdx})" class="${cardStyle}">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-xl ${isSelected ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400 group-hover:text-slate-200 font-bold'} flex items-center justify-center text-xs transition-colors">
+                                ${labels[optIdx]}
+                            </span>
+                            <span class="text-xs sm:text-sm font-semibold">${optText}</span>
+                        </div>
+                        <i class="fa-solid ${isSelected ? 'fa-circle-check text-emerald-400 text-base' : 'fa-circle text-slate-700 text-xs'}"></i>
+                    </div>
+                `;
+            });
+
+            // Feedback explanation box (if question answered)
+            const fbBox = document.getElementById('feedbackBox');
+            if (selectedOpt !== undefined) {
+                const isCorrect = selectedOpt === qData.correct;
+                fbBox.classList.remove('hidden');
+                fbBox.className = `p-4 rounded-2xl border text-xs space-y-1 animate-pop-in ${isCorrect ? 'bg-emerald-950/30 border-emerald-800/60 text-emerald-300' : 'bg-rose-950/30 border-rose-800/60 text-rose-300'}`;
+                
+                document.getElementById('feedbackTitle').innerHTML = isCorrect ? 
+                    '<i class="fa-solid fa-face-smile-beam text-lg text-emerald-400"></i> Дұрыс жауап! Жарайсың!' : 
+                    '<i class="fa-solid fa-face-frown text-lg text-rose-400"></i> Қате жауап! Түсініктемені оқыңыз:';
+                document.getElementById('feedbackText').textContent = qData.explanation;
+            } else {
+                fbBox.classList.add('hidden');
+            }
+
+            // Button visibility controls
+            document.getElementById('btnPrev').disabled = (qIdx === 0);
+            if (qIdx === 9) {
+                document.getElementById('btnNext').classList.add('hidden');
+                document.getElementById('btnSubmit').classList.remove('hidden');
+            } else {
+                document.getElementById('btnNext').classList.remove('hidden');
+                document.getElementById('btnSubmit').classList.add('hidden');
+            }
+        }
+
+        function triggerEmojiToast(emojiText) {
+            const container = document.getElementById('emojiToastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'emoji-toast text-6xl drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]';
+            toast.textContent = emojiText;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 1200);
+        }
+
+        function selectOption(optIdx) {
+            const qIdx = currentState.currentQuestionIdx;
+            const qData = quizData[currentState.selectedVariant][qIdx];
+            currentState.userAnswers[qIdx] = optIdx;
+
+            const isCorrect = (optIdx === qData.correct);
+            
+            if (isCorrect) {
+                playBeep('correct');
+                const positiveEmojis = ['🎉', '⚡️', '😎', '🏆', '🎯', '💯'];
+                const randEmoji = positiveEmojis[Math.floor(Math.random() * positiveEmojis.length)];
+                triggerEmojiToast(randEmoji);
+            } else {
+                playBeep('wrong');
+                const negativeEmojis = ['😢', '🧐', '💡', '📚', '🤔'];
+                const randEmoji = negativeEmojis[Math.floor(Math.random() * negativeEmojis.length)];
+                triggerEmojiToast(randEmoji);
+            }
+
+            renderQuestion();
+        }
+
+        function jumpToQuestion(idx) {
+            currentState.currentQuestionIdx = idx;
+            renderQuestion();
+        }
+
+        function navigateQuestion(dir) {
+            const nextIdx = currentState.currentQuestionIdx + dir;
+            if (nextIdx >= 0 && nextIdx < 10) {
+                currentState.currentQuestionIdx = nextIdx;
+                renderQuestion();
+            }
+        }
+
+        function finishTest() {
+            clearInterval(currentState.timerInterval);
+
+            const qList = quizData[currentState.selectedVariant];
+            let correctCount = 0;
+
+            qList.forEach((q, idx) => {
+                if (currentState.userAnswers[idx] === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            const percent = Math.round((correctCount / 10) * 100);
+            currentState.variantScores[currentState.selectedVariant] = correctCount;
+
+            // View switch
+            document.getElementById('viewQuiz').classList.add('hidden');
+            document.getElementById('viewResult').classList.remove('hidden');
+
+            // Grade emoji & labels
+            let gradeEmoji = '🎉';
+            let gradeText = 'Үздік нәтиже!';
+            if (percent === 100) {
+                gradeEmoji = '🏆';
+                gradeText = 'Керемет! 100% Дұрыс!';
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else if (percent >= 70) {
+                gradeEmoji = '⭐';
+                gradeText = 'Жақсы Нәтиже!';
+            } else if (percent >= 50) {
+                gradeEmoji = '📚';
+                gradeText = 'Талпыныс Жақсы!';
+            } else {
+                gradeEmoji = '💪';
+                gradeText = 'Әлі де дайындалу керек!';
+            }
+
+            document.getElementById('resultEmojiIcon').textContent = gradeEmoji;
+            document.getElementById('resultGradeText').textContent = gradeText;
+            document.getElementById('resultStudentTitle').textContent = `${currentState.studentName} — ${correctCount} / 10 Балл`;
+            document.getElementById('resultVariantSubtitle').textContent = `${currentState.selectedVariant}-нұсқа бойынша қорытынды есеп`;
+
+            document.getElementById('statCorrect').textContent = correctCount;
+            document.getElementById('statWrong').textContent = 10 - correctCount;
+            document.getElementById('statPercent').textContent = `${percent}%`;
+
+            // Detailed review table
+            const reviewContainer = document.getElementById('answersReviewContainer');
+            reviewContainer.innerHTML = '';
+
+            qList.forEach((q, idx) => {
+                const userAns = currentState.userAnswers[idx];
+                const isCorrect = userAns === q.correct;
+                const labels = ['A', 'B', 'C', 'D'];
+
+                reviewContainer.innerHTML += `
+                    <div class="p-4 rounded-2xl border ${isCorrect ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-rose-950/20 border-rose-800/40'} space-y-2 text-xs">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="font-extrabold text-slate-200">${idx + 1}. ${q.q}</span>
+                            <span class="px-2.5 py-0.5 rounded-full font-bold ${isCorrect ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">
+                                ${isCorrect ? 'Дұрыс' : 'Қате'}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
+                            <div class="p-2 rounded-xl bg-slate-950/60 text-slate-300">
+                                Сіздің жауабыңыз: <strong class="${isCorrect ? 'text-emerald-400' : 'text-rose-400'}">${userAns !== undefined ? labels[userAns] + ') ' + q.options[userAns] : 'Жауап берілмеді'}</strong>
+                            </div>
+                            <div class="p-2 rounded-xl bg-slate-950/60 text-slate-300">
+                                Дұрыс жауап: <strong class="text-emerald-400">${labels[q.correct]}) ${q.options[q.correct]}</strong>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 italic text-[11px] pt-1 border-t border-slate-800/50">
+                            💡 Түсініктеме: ${q.explanation}
+                        </p>
+                    </div>
+                `;
+            });
+        }
+
+        function printCertificate() {
+            window.print();
+        }
+
+        function showObjectivesModal() {
+            document.getElementById('objectivesModal').classList.remove('hidden');
+        }
+
+        function closeObjectivesModal() {
+            document.getElementById('objectivesModal').classList.add('hidden');
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            updateHomeVariantBadges();
+        });
+    </script>
+</body>
+</html>
